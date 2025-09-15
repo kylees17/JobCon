@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <startup>
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
+  </startup>
+
+  <connectionStrings>
+    <!-- Active connection strings -->
+    <add name="CENTRALDBTESTConnectionString"
+         connectionString="Data Source=SERVER04;Initial Catalog=CENTRALDBTEST;Persist Security Info=True;User ID=sa;Password=REPLACE_DB_PASSWORD;MultipleActiveResultSets=true;"
+         providerName="System.Data.SqlClient" />
+
+    <add name="conStringCorrespondents"
+         connectionString="Data Source=192.168.0.15;Initial Catalog=DIGITIZE;Persist Security Info=True;User ID=sa;Password=REPLACE_DB_PASSWORD;MultipleActiveResultSets=true;"
+         providerName="System.Data.SqlClient" />
+  </connectionStrings>
+
+  <appSettings>
+    <add key="Cipher" value="1" />
+    <add key="ClientSettingsProvider.ServiceUri" value="" />
+
+    <!-- Use a valid email address here; separate display name if needed -->
+    <add key="sendFromEmail" value="noreply@amwslai.com.ph" />
+    <add key="smtpHost" value="mx.amwslai.com.ph" />
+    <add key="smtpPort" value="587" />
+    <add key="smtpUser" value="noreply@amwslai.com.ph" />
+    <add key="smtpPass" value="REPLACE_SMTP_PASSWORD" />
+  </appSettings>
+
+  <system.web>
+    <membership defaultProvider="ClientAuthenticationMembershipProvider">
+      <providers>
+        <add name="ClientAuthenticationMembershipProvider"
+             type="System.Web.ClientServices.Providers.ClientFormsAuthenticationMembershipProvider, System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"
+             serviceUri="" />
+      </providers>
+    </membership>
+
+    <roleManager defaultProvider="ClientRoleProvider" enabled="true">
+      <providers>
+        <add name="ClientRoleProvider"
+             type="System.Web.ClientServices.Providers.ClientRoleProvider, System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"
+             serviceUri="" cacheTimeout="86400" />
+      </providers>
+    </roleManager>
+  </system.web>
+</configuration>
