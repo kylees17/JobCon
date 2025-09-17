@@ -1,0 +1,57 @@
+Private Async Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
+    If Not ValidateInput() Then Return
+
+    ShowLoading(True)
+
+    Try
+        Dim user = Await GetUserByUsernameAsync(txtUser.Text.Trim())
+        If user Is Nothing Then
+            MessageBox.Show("User not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
+        End If
+
+        If Not VerifyPassword(txtPass.Text.Trim(), user.HashedPassword, user.Salt) Then
+            MessageBox.Show("Invalid password", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
+        End If
+
+        ' Login success
+        CurrentUser.UserID = user.UserID
+        CurrentUser.UserLevel = user.UserLevel
+
+        MDI.Show()
+        Me.Close()
+
+    Catch ex As Exception
+        MessageBox.Show("Login failed: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    Finally
+        ShowLoading(False)
+    End Try
+End Sub
+
+Private Function ValidateInput() As Boolean
+    If String.IsNullOrWhiteSpace(txtUser.Text) Then
+        MessageBox.Show("UserID is required", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        txtUser.Focus()
+        Return False
+    End If
+
+    If String.IsNullOrWhiteSpace(txtPass.Text) Then
+        MessageBox.Show("Password is required", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        txtPass.Focus()
+        Return False
+    End If
+
+    Return True
+End Function
+
+Private Sub ShowLoading(isLoading As Boolean)
+    If isLoading Then
+        frmLoading.Label1.Text = "Please wait while logging in..."
+        frmLoading.Show()
+        Me.Cursor = Cursors.WaitCursor
+    Else
+        frmLoading.Close()
+        Me.Cursor = Cursors.Default
+    End If
+End Sub
