@@ -1,0 +1,32 @@
+Public Class Login
+
+    Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
+        If checkentry() Then
+            frmLoading.Label1.Text = "Please wait while logging in"
+            frmLoading.Show()
+
+            Me.Cursor = Cursors.WaitCursor
+            'Me.Enabled = False
+
+            Dim dt As New DataTable
+            dt = cls.GetRecord("*", "projectusers", " where userid='" & Trim(txtUser.Text) & "' and userpass='" & Trim(txtPass.Text) & "'")
+
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                ' successful login
+                userid = dt.Rows(0)("userid").ToString()
+                userlevel = dt.Rows(0)("userlevel").ToString()
+                usergroup = dt.Rows(0)("usergroup").ToString()
+                caller = "Login"
+
+                ' proceed to main form
+                frmLoading.Close()
+                Me.Hide()
+                MainForm.Show()
+            Else
+                frmLoading.Close()
+                MessageBox.Show("Invalid username or password", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+        End If
+    End Sub
+
+End Class
