@@ -1,23 +1,25 @@
-  <?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
     <startup>
         <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
     </startup>
+
 	<connectionStrings>
 		<!-- test -->
-		<!--<add name="DataConnectionFinancial" connectionString="Zv77aAAMD+Kn9H//06BdOJH1V9qfPt0PuVTapPZG3k2UmEcsEhzKnm/+HXX9ZZLnBsf9l2nSD1xtRdAh1uaE7Alj5Xb4pYAkG9noQ2ZIKiU="/>
-		<add name="
-		 " connectionString="Zv77aAAMD+Kn9H//06BdOEHuTXR9dEXrfkthg54RGPApLZXT4pY+xjXWicXeYZfxRexDOuZUmMqVgcFTSEmShVokTIdjj2ygOfuYKQnPcdk="/>-->
-		<!--<add name="DataConnectionLive" connectionString="flVWgE3HxEv1pRwSRa77L3Rz3cbWjwbomQKPdzwadsiy0LxQ0vgcAqLaCvZjSUwt5FwI1hioGLNU/s7KQY9GhW1Q1GlK0cmqS4Pr0dnpKPw="/>-->
+		<!--
+    <add name="DataConnectionFinancial" connectionString="Zv77aAAMD+Kn9H//06BdOJH1V9qfPt0PuVTapPZG3k2UmEcsEhzKnm/+HXX9ZZLnBsf9l2nSD1xtRdAh1uaE7Alj5Xb4pYAkG9noQ2ZIKiU="/>
+    <add name="DataConnectionCentralDB" connectionString="Zv77aAAMD+Kn9H//06BdOEHuTXR9dEXrfkthg54RGPApLZXT4pY+xjXWicXeYZfxRexDOuZUmMqVgcFTSEmShVokTIdjj2ygOfuYKQnPcdk="/>
+  <add name="DataConnectionLive" connectionString="flVWgE3HxEv1pRwSRa77L3Rz3cbWjwbomQKPdzwadsiy0LxQ0vgcAqLaCvZjSUwt5FwI1hioGLNU/s7KQY9GhW1Q1GlK0cmqS4Pr0dnpKPw="/>-->
 		<!-- LIVE -->
 		<!--<add name="DataConnection" connectionString=""/>-->
 		<!-- END LIVE -->
-		
-    <add name="CENTRALDBTESTConnectionString" connectionString="Data Source=SERVER04;Initial Catalog=CENTRALDBTEST;Persist Security Info=True;User ID=sa;Password=abcd@1234" providerName="System.Data.SqlClient" />
-    <add name="conStringCorrespondents" connectionString="Data Source=192.168.0.15;Initial Catalog=DIGITIZE;Persist Security Info=True;User ID=sa;Password=abcd@1234;MultipleActiveResultSets=true;" />
+
+		<add name="CENTRALDBTESTConnectionString" connectionString="Data Source=SERVER04;Initial Catalog=CENTRALDBTEST;Persist Security Info=True;User ID=sa;Password=P@$$word28" providerName="System.Data.SqlClient" />
+		<add name="conStringCorrespondents" connectionString="Data Source=192.168.0.15;Initial Catalog=DIGITIZE;Persist Security Info=True;User ID=sa;Password=P@$$word28;MultipleActiveResultSets=true;" />
 		<!--<add name="DataCon" connectionString="Data Source=SERVERHO;Initial Catalog=SLS_CENTRAL_DB;Persist Security Info=True;User ID=WEBUsers;Password=V@ltron;MultipleActiveResultSets=true;Connection Timeout=0"/>
        <add name="conStringCorrespondents" connectionString="Data Source=192.168.0.20;Initial Catalog=DIGITIZE;Persist Security Info=True;User ID=sa;Password=abc@123;MultipleActiveResultSets=true;" />-->
 	</connectionStrings>
+
 	<appSettings>
 		<add key="Cipher" value="1"/>
 		<!--<add key="Printer" value="EPSON LX-310" />-->
@@ -43,4 +45,6 @@
 			</providers>
 		</roleManager>
 	</system.web>
+	
+	
 </configuration>
