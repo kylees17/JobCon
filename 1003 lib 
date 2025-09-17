@@ -1,0 +1,49 @@
+Module MyLibrary
+
+    Public cls As New datacenter
+    Public userid As String, userlevel As String, caller As String, usergroup As String
+
+    ' Encryption
+    Public Function enc(parameter As String) As String
+        Dim charr As String
+        Dim result As String = ""
+        For i As Integer = 1 To Len(parameter)
+            charr = Mid(StrReverse(parameter), i, 1)
+            result &= Hex(Asc(charr))
+        Next i
+        Return result
+    End Function
+
+    ' Decryption
+    Public Function decry(parameter As String) As String
+        Dim result As String = ""
+        For i As Integer = 1 To Len(parameter) Step 2
+            Dim charr As String = Mid(parameter, i, 2)
+            result &= ChrW(Convert.ToInt32(charr, 16))
+        Next i
+        Return StrReverse(result)
+    End Function
+
+    Public Function projectControl(desc As String) As String
+        Dim dt As New DataTable
+        dt = cls.GetRecordII("exec spProjectDCFNo '" & desc & "'")
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            Return dt.Rows(0)("ProjectNo").ToString()
+        Else
+            Return ""
+        End If
+    End Function
+
+    Public Function projectSDF(DCFNo As String) As String
+        Dim dt As New DataTable
+        dt = cls.GetRecordII("exec spProjectSDFNo '" & DCFNo & "'")
+
+        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+            Return dt.Rows(0)("ProjectNo").ToString()
+        Else
+            Return ""
+        End If
+    End Function
+
+End Module
