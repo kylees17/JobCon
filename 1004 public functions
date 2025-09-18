@@ -1,0 +1,229 @@
+Module publicfunctions
+
+    'Public Sub populateCMB(cmb As ComboBox, type As String)
+    '    cmb.Items.Clear()
+    '    Dim dt As New DataTable
+
+    '    If type = "programmer" Then
+    '        'dt = cls.GetRecord("a.UserName description", "projectusers a left join Reference b on a.UserLevel=b.Code", " where b.Type='misddesignation' and b.Code='2'")
+    '        dt = cls.GetRecord("userid description", "useraccess", " where userid='ANESLAGONC' or userid='BAETAMS'")
+    '    Else
+    '        dt = cls.GetRecord("*", "Reference", " where type='" & type & "' and active='1'")
+    '    End If
+
+    '    For i As Integer = 0 To dt.Rows.Count - 1
+    '        cmb.Items.Add(dt.Rows(i)("Description"))
+    '    Next
+
+    'End Sub
+
+    Public Sub populatecombo(combo As ComboBox, type As String, Optional condition As String = "", Optional showCode As Integer = 1)
+        combo.Items.Clear()
+
+        If combo.Name = "cmbFilter" Or combo.Name = "cmbBranchDept" Or combo.Name = "cmbPriority" Or combo.Name = "cmbStatusProj" Or combo.Name = "cmbAppSearch" Or combo.Name = "cmbSection" Then
+            combo.Items.Add("All")
+        End If
+
+        If condition <> "" Then
+            condition = "and " & condition
+        End If
+
+        Dim dt = New DataTable
+
+        If type = "programmer" Then
+            'dt = cls.GetRecord("userid code", "useraccess", " where userid='ANESLAGONC' or userid='BAETAMS'")
+            combo.Items.Add("All")
+            dt = cls.GetRecordII("exec spGetGroupUserByModuleIDandGroupLvl '26','20',''")
+        ElseIf type = "FSBranchDepartment" Then
+            dt = cls.GetRecord("concat(rtrim(branchno),' - ',branchname) as code", "FSBranchDepartment", " order by branchno")
+        Else
+            If showCode = 1 Then
+                dt = cls.GetRecord("concat(rtrim(code),' - ',description) as code", "Reference", " where type='" & type & "' and active='1' " & condition & " order by code asc")
+            Else
+                dt = cls.GetRecord("description as code", "Reference", " where type='" & type & "' and active='1' " & condition & " order by description asc")
+            End If
+        End If
+
+popHere:
+        For i As Integer = 0 To dt.Rows.Count - 1
+            combo.Items.Add(dt.Rows(i)("code").ToString())
+        Next
+    End Sub
+
+    Public Function dateToWord(x As String) As String
+        Dim parts As String() = x.Split("/")
+        dateToWord = ""
+        If parts(0) = "1" Then
+            dateToWord = "Jan. "
+        ElseIf parts(0) = "2" Then
+            dateToWord = "Feb. "
+        ElseIf parts(0) = "3" Then
+            dateToWord = "Mar. "
+        ElseIf parts(0) = "4" Then
+            dateToWord = "Apr. "
+        ElseIf parts(0) = "5" Then
+            dateToWord = "May "
+        ElseIf parts(0) = "6" Then
+            dateToWord = "Jun. "
+        ElseIf parts(0) = "7" Then
+            dateToWord = "Jul. "
+        ElseIf parts(0) = "8" Then
+            dateToWord = "Aug. "
+        ElseIf parts(0) = "9" Then
+            dateToWord = "Sep. "
+        ElseIf parts(0) = "10" Then
+            dateToWord = "Oct. "
+        ElseIf parts(0) = "11" Then
+            dateToWord = "Nov. "
+        Else
+            dateToWord = "Dec. "
+        End If
+
+        Try
+            dateToWord += parts(1) & "," & Mid(parts(2), 1, 4)
+        Catch ex As Exception
+            dateToWord = ""
+        End Try
+
+    End Function
+
+    Public Function cureValue(x)
+        cureValue = x
+        If IsDBNull(cureValue) Then
+            cureValue = ""
+        End If
+    End Function
+
+    Public Function assignValue(obj As Object, x As Object)
+        If TypeOf obj Is DateTimePicker Then
+            If Not IsDBNull(x) Then
+                If x.ToString() <> "" Then
+                    With obj
+                        Try
+                            .value = x
+                        Catch ex As Exception
+                            .value = DateTime.Now
+                        End Try
+                    End With
+                End If
+            End If
+        Else
+            With obj
+                .text = cureValue(x)
+            End With
+        End If
+    End Function
+
+
+    Public Function groupAccess(grouper As Object, indicator As Boolean)
+        With grouper
+            For Each ctrl As Control In .Controls
+                If TypeOf ctrl Is TextBox Then
+                    Dim txt As TextBox = DirectCast(ctrl, TextBox)
+                    txt.ReadOnly = Not indicator
+                ElseIf TypeOf ctrl Is DateTimePicker Then
+                    Dim obj As DateTimePicker = DirectCast(ctrl, DateTimePicker)
+                    obj.Enabled = indicator
+                ElseIf TypeOf ctrl Is Button Then
+                    Dim obj As Button = DirectCast(ctrl, Button)
+                    obj.Enabled = indicator
+                ElseIf TypeOf ctrl Is DataGridView Then
+                    Dim obj As DataGridView = DirectCast(ctrl, DataGridView)
+                    obj.ReadOnly = Not indicator
+                ElseIf TypeOf ctrl Is RichTextBox Then
+                    Dim obj As RichTextBox = DirectCast(ctrl, RichTextBox)
+                    obj.ReadOnly = Not indicator
+                ElseIf TypeOf ctrl Is ComboBox Then
+                    Dim obj As ComboBox = DirectCast(ctrl, ComboBox)
+                    obj.Enabled = indicator
+                ElseIf TypeOf ctrl Is CheckBox Then
+                    Dim obj As CheckBox = DirectCast(ctrl, CheckBox)
+                    obj.Enabled = indicator
+                End If
+
+            Next
+        End With
+    End Function
+
+    Function dcfStatus(DCFNO As String) As String
+        Dim dtDCFStatusUser = New DataTable
+        dtDCFStatusUser = cls.GetRecord("status", "ProjectHeader", " where DCFNo='" & DCFNO & "'")
+
+        dcfStatus = dtDCFStatusUser.Rows(0)("status")
+    End Function
+
+    Function dcfisUser(DCFNO As String) As Boolean
+        Dim dtDCFStatusUser = New DataTable
+        dtDCFStatusUser = cls.GetRecord("Programmer", "ProjectHeader", " where DCFNo='" & DCFNO & "' and Programmer='" & userid & "'")
+
+        dcfisUser = False
+        If dtDCFStatusUser.Rows.Count > 0 Then
+            dcfisUser = True
+        End If
+    End Function
+
+    Function DCFAllowEdit(status As String, isUser As Boolean) As Boolean
+        DCFAllowEdit = False
+        If (status = "O" Or status = "P" Or status = "H") And isUser = True Then
+            DCFAllowEdit = True
+        End If
+    End Function
+
+    Public Function alldeployed(SDFNo As String) As Boolean
+        alldeployed = False
+
+        Dim dt = New DataTable
+        dt = cls.GetRecord("iif(DBDeployNeeded='1',isnull(DBDeployed,'0'),'1') DB, iif(AppDeployNeeded='1',isnull(AppDeployed,'0'),'1') IT", "projectSDF", " where SDFNo='" & SDFNo & "'")
+        If dt.Rows.Count > 0 Then
+            If dt.Rows(0)("DB") = "1" And dt.Rows(0)("IT") = "1" Then
+                alldeployed = True
+                cls.ExecQuery("exec spProjectFinish '" & SDFNo & "'")
+            End If
+        End If
+
+    End Function
+
+    Public Function getUserIDName(search As String, type As Char) As String
+        Dim dt = New DataTable
+        If type = "1" Then
+            dt = cls.GetRecord("userid", "useraccess", " where username = '" & Trim(search) & "'")
+        Else
+            dt = cls.GetRecord("username", "useraccess", " where userid = '" & Trim(search) & "'")
+        End If
+
+        If dt.Rows.Count > 0 Then
+            getUserIDName = Trim(dt.Rows(0)(0))
+        Else
+            getUserIDName = ""
+        End If
+
+        Return Trim(getUserIDName)
+    End Function
+
+    Public Function getSDFNo(DCFNo As String) As String
+        Dim dt = New DataTable
+        dt = cls.GetRecord("SDFNo", "projectSDF", " where DCFNo='" & DCFNo & "' and status<>'C'")
+
+        getSDFNo = ""
+        If dt.Rows.Count > 0 Then
+            getSDFNo = Trim(dt.Rows(0)("SDFNo").ToString())
+        End If
+    End Function
+
+    Public Function getAppCode(search As String) As String
+        Dim dt = New DataTable
+        dt = cls.GetRecord("ISNULL(code,'')", "Reference", " where Type='systemref' and Description='" & Trim(search) & "'")
+
+        getAppCode = search
+
+        If dt.Rows.Count > 0 Then
+            getAppCode = dt.Rows(0)(0)
+        End If
+
+        Return Trim(getAppCode)
+    End Function
+
+
+
+
+End Module
