@@ -1,0 +1,91 @@
+Public Class Login
+
+    Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
+        If Not ValidateInputs() Then Exit Sub
+
+        Try
+            ShowLoading("Please wait while logging in")
+
+            Dim userRecord As DataRow = GetUserRecord(txtUser.Text.Trim())
+            If userRecord Is Nothing Then
+                MessageBox.Show("User ID not found", "System Message",
+                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                Exit Sub
+            End If
+
+            If Not PasswordIsValid(userRecord, txtPass.Text.Trim()) Then
+                MessageBox.Show("Invalid Password", "System Message",
+                                MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                Exit Sub
+            End If
+
+            ' Store session info
+            userid = userRecord("UserID").ToString()
+            userlevel = userRecord("UserLevel").ToString()
+
+            MDI.Show()
+            Me.Close()
+
+        Catch ex As Exception
+            MessageBox.Show("An unexpected error occurred: " & ex.Message,
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            HideLoading()
+        End Try
+    End Sub
+
+    Private Function ValidateInputs() As Boolean
+        If String.IsNullOrWhiteSpace(txtUser.Text) Then
+            MessageBox.Show("User ID is required", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        If String.IsNullOrWhiteSpace(txtPass.Text) Then
+            MessageBox.Show("Password is required", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        Return True
+    End Function
+
+    Private Function GetUserRecord(userId As String) As DataRow
+        ' Use parameters to prevent SQL injection
+        Dim query As String = "SELECT * FROM projectusers WHERE userid=@userid"
+        Dim dt As DataTable = cls.GetRecordSafe(query, New With {.userid = userId})
+
+        If dt.Rows.Count = 0 Then
+            Return Nothing
+        End If
+        Return dt.Rows(0)
+    End Function
+
+    Private Function PasswordIsValid(userRecord As DataRow, inputPassword As String) As Boolean
+        Dim encryptedPass As String = userRecord("password").ToString()
+        Dim dt As DataTable = cls.GetRecordII("exec spDePalindrome @pass", New With {.pass = encryptedPass})
+
+        If dt.Rows.Count = 0 Then Return False
+
+        Dim decryptedPass As String = dt.Rows(0)(0).ToString()
+        Return decryptedPass = inputPassword
+    End Function
+
+    ' --- Helpers to show/hide loading form --- 
+    Private Sub ShowLoading(message As String)
+        Me.Cursor = Cursors.WaitCursor
+        frmLoading.Label1.Text = message
+        frmLoading.Show()
+        Application.DoEvents()
+    End Sub
+
+    Private Sub HideLoading()
+        frmLoading.Close()
+        Me.Cursor = Cursors.Default
+    End Sub
+
+    Private Sub txtPass_KeyDown(sender As Object, e As KeyEventArgs) Handles txtPass.KeyDown
+        If e.KeyCode = Keys.Enter Then
+            btnLogin.PerformClick()
+        End If
+    End Sub
+
+End Class
