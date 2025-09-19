@@ -1,0 +1,36 @@
+Imports Microsoft.VisualBasic
+Imports System.Data
+
+Public Class datacenter
+
+    Dim ws As New WebServiceSoapClient()
+
+    Public Function GetDataSet(query As String, dt As String) As NatureOfRequest
+        Return ws.SelectTableForCS(query, dt)
+    End Function
+
+    Public Function GetDataSetDSSDF(query As String, dt As String) As DSSDF
+        Return ws.SelectTableForCS(query, dt) ' Assuming same WS method works
+    End Function
+
+    Public Function GetRecord(strFields As String, strTable As String, strCondition As String) As DataTable
+        Return ws.QueryForCS("SELECT " & strFields & " FROM " & strTable & strCondition)
+    End Function
+
+    Public Function getProjectObject(DCFNo As String, ObjectClass As String, ObjectType As String) As DataTable
+        Return GetRecord("ObjectName,Remarks,isnull(FromDB,'') FromDB",
+                         "ProjectObject",
+                         " WHERE ObjectClass='" & ObjectClass & "' AND ObjectType='" & ObjectType & "' AND DCFNo='" & DCFNo & "'")
+    End Function
+
+    Public Function ExecQuery(ByVal sSql As String)
+        Try
+            ws.ExecuteNonQuery(sSql) ' <-- You need a matching WS method for non-query SQL
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Function
+
+    ' The rest of your helper functions (getFullName, getDCFApprove, etc.)
+    ' can still call GetRecord / GetDataSet, which now go through the WS.
+End Class
