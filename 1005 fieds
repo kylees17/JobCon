@@ -1,0 +1,118 @@
+Imports Microsoft.VisualBasic
+Imports System.Data
+
+Public Class datacenter
+
+    ' Keep your existing fields
+    Dim constringData As String = ""   ' Not used anymore but kept
+    Dim IsCipher As String = ""        ' Not used anymore but kept
+    Dim conn As Object = Nothing       ' Not used anymore but kept
+    Dim cmd As Object = Nothing        ' Not used anymore but kept
+
+    ' Add WebService client
+    Dim ws As New WebServiceSoapClient()
+
+    '==============================
+    ' Data retrieval functions
+    '==============================
+
+    Public Function GetDataSet(query As String, dt As String) As NatureOfRequest
+        Dim dsDeclaredDataSet As New NatureOfRequest
+        dsDeclaredDataSet = ws.SelectTableForCS(query, dt)
+        Return dsDeclaredDataSet
+    End Function
+
+    Public Function GetDataSetDSSDF(query As String, dt As String) As DSSDF
+        Dim dsDeclaredDataSet As New DSSDF
+        dsDeclaredDataSet = ws.SelectTableForCS(query, dt)
+        Return dsDeclaredDataSet
+    End Function
+
+    Public Function GetRecord(strFields As String, strTable As String, strCondition As String) As DataTable
+        Return ws.QueryForCS("SELECT " & strFields & " FROM " & strTable & strCondition)
+    End Function
+
+    Public Function getProjectObject(DCFNo As String, ObjectClass As String, ObjectType As String) As DataTable
+        Return GetRecord("ObjectName,Remarks,isnull(FromDB,'') FromDB",
+                         "ProjectObject",
+                         " WHERE ObjectClass='" & ObjectClass & "' AND ObjectType='" & ObjectType & "' AND DCFNo='" & DCFNo & "'")
+    End Function
+
+    '==============================
+    ' Non-query execution
+    '==============================
+
+    Public Function ExecQuery(ByVal sSql As String)
+        Try
+            ws.ExecuteNonQuery(sSql) ' <-- Your WebService must expose this
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Function
+
+    '==============================
+    ' Extra DataTable query
+    '==============================
+
+    Public Function GetRecordII(ByVal sSql As String) As DataTable
+        Try
+            Return ws.QueryForCS(sSql)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+            Return Nothing
+        End Try
+    End Function
+
+    '==============================
+    ' Helper functions
+    '==============================
+
+    Function getcode(code As String) As String
+        getcode = code
+        If code <> "All" Then
+            getcode = Split(code, " - ")(0)
+        End If
+        Return Trim(getcode)
+    End Function
+
+    Function getFullName(uid As String) As String
+        Dim dt = GetRecord("UserName", "useraccess", " WHERE UserID='" & uid & "'")
+        If dt.Rows.Count > 0 Then
+            Return dt.Rows(0)("UserName").ToString()
+        End If
+        Return ""
+    End Function
+
+    Function getDCFApprove(dcfNo As String) As String
+        Dim dt = GetRecord("TOP 1 UserID", "ProjectStatusHist", " WHERE DCFNo='" & dcfNo & "' AND ProjectStatus='T' ORDER BY ProjectDate DESC")
+        If dt.Rows.Count > 0 Then
+            Return getUserIDName(dt.Rows(0)("UserID").ToString(), "2")
+        End If
+        Return ""
+    End Function
+
+    Function getDCFQA(dcfno As String) As String
+        Dim dt = GetRecord("TOP 1 UserID", "ProjectStatusHist", " WHERE DCFNo='" & dcfno & "' AND ProjectStatus='F' ORDER BY ProjectDate DESC")
+        If dt.Rows.Count > 0 Then
+            Return getUserIDName(dt.Rows(0)("UserID").ToString(), "2")
+        End If
+        Return ""
+    End Function
+
+    Function getDCFQADate(dcfno As String) As String
+        Dim dt = GetRecord("TOP 1 CAST(ProjectDate AS DATE) ProjectDate", "ProjectStatusHist", " WHERE DCFNo='" & dcfno & "' AND ProjectStatus='F' ORDER BY ProjectDate DESC")
+        If dt.Rows.Count > 0 Then
+            Return dateToWord(dt.Rows(0)("ProjectDate").ToString())
+        End If
+        Return ""
+    End Function
+
+    Function getDCFApproveDate(dcfNo As String) As String
+        Dim dt = GetRecord("TOP 1 CAST(ProjectDate AS DATE) ProjectDate", "ProjectStatusHist", " WHERE DCFNo='" & dcfNo & "' AND ProjectStatus='T' ORDER BY ProjectDate DESC")
+        If dt.Rows.Count > 0 Then
+            Return dateToWord(dt.Rows(0)("ProjectDate").ToString())
+        End If
+        Return ""
+    End Function
+
+End Class
